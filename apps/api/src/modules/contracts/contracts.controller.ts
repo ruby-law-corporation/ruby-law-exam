@@ -18,8 +18,8 @@ export async function uploadContract(
   res.status(201).json({ data: result });
 }
 
-export function getContract(req: Request, res: Response): void {
-  const record = getContractById(req.params.id ?? '');
+export async function getContract(req: Request, res: Response): Promise<void> {
+  const record = await getContractById(req.params.id ?? '');
   if (!record) {
     throw new ApiError(404, 'NOT_FOUND', 'Contract not found');
   }

@@ -9,13 +9,20 @@ vi.mock('./contracts.extractor', () => ({
 vi.mock('./contracts.ai', () => ({
   analyseText: vi.fn(),
 }));
+vi.mock('./contracts.store', () => ({
+  saveContract: vi.fn((record) => Promise.resolve(record)),
+  findContractById: vi.fn(),
+}));
 
 import { analyseText } from './contracts.ai';
 import { extractText } from './contracts.extractor';
 import { analyseContract, getContractById } from './contracts.service';
+import { findContractById, saveContract } from './contracts.store';
 
 const extractTextMock = vi.mocked(extractText);
 const analyseTextMock = vi.mocked(analyseText);
+const saveContractMock = vi.mocked(saveContract);
+const findContractByIdMock = vi.mocked(findContractById);
 
 describe('contracts.service', () => {
   beforeEach(() => {
@@ -43,7 +50,10 @@ describe('contracts.service', () => {
       filename: 'nda.pdf',
     });
     expect(result.id).toBeTruthy();
-    expect(getContractById(result.id)).toEqual(result);
+    expect(saveContractMock).toHaveBeenCalledWith(result);
+
+    findContractByIdMock.mockResolvedValue(result);
+    expect(await getContractById(result.id)).toEqual(result);
   });
 
   it('propagates the error when the AI service is unavailable', async () => {

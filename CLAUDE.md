@@ -51,7 +51,7 @@ routes → controller → service → { extractor, ai, store }
 
 - **`server.ts`** imports `./config/load-env` _first_ (side-effect dotenv load) before anything reads `env`, then starts `createApp()`. `app.ts` holds the Express wiring (CORS locked to `env.WEB_ORIGIN`, `/api/health`, the contracts router, and the error handler **last**).
 - **`modules/contracts/`** is the feature module. The naming convention is `contracts.<layer>.ts` (`.routes`, `.controller`, `.service`, `.ai`, `.extractor`, `.store`, `.upload`). Controllers translate HTTP ↔ service calls and throw `ApiError`; **services never touch `req`/`res`**.
-- **`platform/http/`** is shared HTTP infrastructure: `ApiError` (status + stable code + message), `asyncHandler` (wraps async handlers so rejections reach Express's error pipeline — note `GET /:id` is sync and doesn't use it), and `errorHandler` which maps `ApiError`, `MulterError` (→ 413 on `LIMIT_FILE_SIZE`), and unknown errors into the standard envelope.
+- **`platform/http/`** is shared HTTP infrastructure: `ApiError` (status + stable code + message), `asyncHandler` (wraps async handlers so rejections reach Express's error pipeline — both `POST /contracts/upload` and `GET /contracts/:id` use it, since both are async), and `errorHandler` which maps `ApiError`, `MulterError` (→ 413 on `LIMIT_FILE_SIZE`), and unknown errors into the standard envelope.
 
 ### Response envelope (a hard convention)
 
@@ -67,7 +67,9 @@ Every endpoint returns either `{ "data": ... }` (success) or `{ "error": { "code
 
 ### Storage
 
-In-memory `Map` in `contracts.store.ts` — intentional, no database. Data is lost on restart.
+Postgres via Prisma. `contracts.store.ts` is a thin repository (`saveContract` / `findContractById`) over the shared `PrismaClient` singleton in `platform/db/prisma.ts`. The `Contract` model in `apps/api/prisma/schema.prisma` mirrors `contractAnalysisSchema` exactly — `type` and `createdAt` are stored as `String` (no enum/`DateTime`) and the arrays use Postgres `String[]` — so the persisted row equals `ContractAnalysis` with no field mapping; the store just asserts the row type (the values are already validated upstream by `contractAIResultSchema`). The generated client lives in `apps/api/src/generated/prisma` — **gitignored**, so run `pnpm --filter @app/api db:generate` after install (the `build`/`typecheck` scripts also run `prisma generate` first). `apps/api/prisma.config.ts` loads the root `.env` so the Prisma CLI sees `DATABASE_URL`. Because reads now hit the DB, `getContractById` is async and `GET /contracts/:id` uses `asyncHandler`.
+
+No migrations — the schema is small and disposable, so it's synced with `prisma db push` rather than tracked migration files. DB scripts (run from repo root): `pnpm --filter @app/api db:generate` (regen client), `db:push` (sync schema to a running Postgres). `pnpm docker:up` brings up a `db` (Postgres 16) service and runs `prisma db push` before the API starts.
 
 ## Conventions
 

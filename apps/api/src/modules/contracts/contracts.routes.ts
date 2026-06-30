@@ -10,4 +10,4 @@ contractsRouter.post(
   uploadMiddleware,
   asyncHandler(uploadContract),
 );
-contractsRouter.get('/contracts/:id', getContract);
+contractsRouter.get('/contracts/:id', asyncHandler(getContract));

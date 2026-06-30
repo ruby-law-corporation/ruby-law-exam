@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "turbo run dev --parallel",
+    "dev:with-db": "docker compose up -d db && pnpm --filter @app/api db:push && pnpm dev",
     "dev:api": "pnpm --filter @app/api dev",
     "dev:web": "pnpm --filter @app/web dev",
     "build": "turbo run build",

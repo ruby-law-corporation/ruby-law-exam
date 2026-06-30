@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { ContractAnalysis } from '@app/types';
 import { analyseText } from './contracts.ai';
 import { extractText } from './contracts.extractor';
-import { contractStore } from './contracts.store';
+import { findContractById, saveContract } from './contracts.store';
 
 export async function analyseContract(
   buffer: Buffer,
@@ -19,10 +19,9 @@ export async function analyseContract(
     createdAt: new Date().toISOString(),
   };
 
-  contractStore.set(record.id, record);
-  return record;
+  return saveContract(record);
 }
 
-export function getContractById(id: string): ContractAnalysis | undefined {
-  return contractStore.get(id);
+export function getContractById(id: string): Promise<ContractAnalysis | null> {
+  return findContractById(id);
 }

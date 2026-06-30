@@ -1,3 +1,4 @@
+import { MAX_FILE_SIZE_MB } from '@app/types';
 import type { NextFunction, Request, Response } from 'express';
 import { MulterError } from 'multer';
 import { ApiError } from './api-error';
@@ -20,7 +21,7 @@ export function errorHandler(
       res.status(413).json({
         error: {
           code: 'FILE_TOO_LARGE',
-          message: 'File exceeds the 10 MB limit',
+          message: `File exceeds the ${MAX_FILE_SIZE_MB} MB limit`,
         },
       });
       return;
