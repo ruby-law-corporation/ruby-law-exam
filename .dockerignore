@@ -1,0 +1,17 @@
+**/node_modules
+**/dist
+**/build
+**/.turbo
+.git
+.github
+.husky
+.idea
+.vscode
+.DS_Store
+**/.env
+**/.env.*
+*.log
+logs
+samples
+README.md
+EXAM.md

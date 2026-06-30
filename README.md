@@ -29,28 +29,32 @@ Read the full exam specification here: **[EXAM.md](./EXAM.md)**
 
 ---
 
-## Starter structure
+## Project structure
 
-This repo gives you a minimal starting point. You are free to reorganise it.
+A pnpm + Turborepo monorepo. Apps live under `apps/`, shared packages under `packages/`.
 
 ```
 /
-├── backend/                # Express + TypeScript API
-│   ├── src/
-│   │   ├── routes/
-│   │   ├── controllers/
-│   │   ├── services/
-│   │   └── index.ts
-│   ├── tsconfig.json
-│   └── package.json
-├── frontend/               # React + Vite + TypeScript
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── main.tsx
-│   ├── vite.config.ts
-│   └── package.json
-├── .env.example            # Copy to .env and fill in your keys
+├── apps/
+│   ├── api/                # Express + TypeScript API (@app/api)
+│   │   └── src/
+│   │       ├── config/         # env loading
+│   │       ├── platform/http/  # ApiError, async handler, error handler
+│   │       └── modules/
+│   │           └── contracts/  # routes → controller → service → ai/extractor/store
+│   └── web/                # React + Vite + TypeScript (@app/web)
+│       └── src/
+│           ├── components/
+│           └── pages/
+├── packages/
+│   ├── types/              # @app/types — shared Zod schemas + inferred types
+│   └── eslint-config/      # @app/eslint-config — shared flat ESLint config (base + react)
+├── docker/                 # Dockerfiles for the api + web images
+├── docker-compose.yml      # Run API + web together
+├── tsconfig.base.json      # Shared TS compiler options
+├── turbo.json              # Turborepo task pipeline
+├── pnpm-workspace.yaml
+├── .env.example            # Copy to .env at the repo root
 ├── EXAM.md                 # Full specification (read this first)
 └── README.md               # This file
 ```
@@ -58,6 +62,8 @@ This repo gives you a minimal starting point. You are free to reorganise it.
 ---
 
 ## Local setup
+
+Requires **Node.js 22+** and **pnpm 10+** (`corepack enable` will provision pnpm).
 
 ```bash
 # 1. Fork this repo on GitHub, then clone YOUR fork
@@ -67,20 +73,38 @@ cd ruby-law-exam
 # 2. Create your branch
 git checkout -b candidate/<your-github-username>
 
-# 3. Install dependencies
-cd backend && npm install
-cd ../frontend && npm install
+# 3. Install all workspace dependencies from the repo root
+pnpm install
 
-# 4. Set up environment variables
+# 4. Set up environment variables (single .env at the repo root)
 cp .env.example .env
 # Edit .env and add your OPENAI_API_KEY
 
-# 5. Run backend (port 3001)
-cd backend && npm run dev
-
-# 6. Run frontend in a second terminal (port 5173)
-cd frontend && npm run dev
+# 5. Run both API (port 3001) and web (port 5173) together
+pnpm dev
+# …or individually:
+pnpm dev:api
+pnpm dev:web
 ```
+
+### Workspace commands (run from the repo root)
+
+| Command          | Description                              |
+| ---------------- | ---------------------------------------- |
+| `pnpm dev`       | Run API + web in parallel                |
+| `pnpm build`     | Build all apps                           |
+| `pnpm typecheck` | Type-check every package                 |
+| `pnpm lint`      | ESLint across the workspace              |
+| `pnpm test`      | Run unit tests (Vitest)                  |
+| `pnpm format`    | Prettier write                           |
+| `pnpm docker:up` | Build & run API + web via Docker Compose |
+
+### Docker
+
+`pnpm docker:up` builds both images and runs them with Docker Compose: the API on
+**http://localhost:3001** and the web app on **http://localhost:5173** (served by Vite's
+preview server). Pass your `OPENAI_API_KEY` via the root `.env` or the environment when
+running compose.
 
 ---
 

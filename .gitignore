@@ -4,18 +4,18 @@ node_modules/
 # Build output
 dist/
 build/
+.turbo/
 
 # Environment files — NEVER commit these
 .env
 .env.local
 .env.*.local
-backend/.env
-frontend/.env
 
 # Uploaded files (if stored locally)
 uploads/
 
 # Logs
+logs/
 *.log
 npm-debug.log*
 
