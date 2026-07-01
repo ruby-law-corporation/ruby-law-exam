@@ -4,7 +4,6 @@ WORKDIR /repo
 
 COPY . .
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @app/api exec prisma generate
 
 EXPOSE 3001
-CMD ["sh", "-c", "pnpm --filter @app/api exec prisma db push && pnpm --filter @app/api exec tsx src/server.ts"]
+CMD ["pnpm", "--filter", "@app/api", "exec", "tsx", "src/server.ts"]

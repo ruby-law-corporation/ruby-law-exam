@@ -10,7 +10,6 @@
   },
   "scripts": {
     "dev": "turbo run dev --parallel",
-    "dev:with-db": "docker compose up -d db && pnpm db:push && pnpm dev",
     "dev:api": "pnpm --filter @app/api dev",
     "dev:web": "pnpm --filter @app/web dev",
     "build": "turbo run build",
@@ -18,9 +17,6 @@
     "lint": "turbo run lint",
     "format": "prettier --write .",
     "test": "turbo run test",
-    "db:generate": "pnpm --filter @app/api db:generate",
-    "db:push": "pnpm --filter @app/api db:push",
-    "db:studio": "pnpm --filter @app/api db:studio",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down",
     "prepare": "husky"

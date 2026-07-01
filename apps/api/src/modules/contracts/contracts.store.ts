@@ -1,16 +1,16 @@
-import { contractAnalysisSchema, type ContractAnalysis } from '@app/core';
-import { prisma } from '../../platform/db/prisma';
+import { type ContractAnalysis } from '@app/core';
+import { InMemoryStore, type Store } from '../../platform/db/store';
+
+const store: Store<ContractAnalysis> = new InMemoryStore<ContractAnalysis>();
 
 export async function saveContract(
   record: ContractAnalysis,
 ): Promise<ContractAnalysis> {
-  const row = await prisma.contract.create({ data: record });
-  return contractAnalysisSchema.parse(row);
+  return store.set(record.id, record);
 }
 
 export async function findContractById(
   id: string,
 ): Promise<ContractAnalysis | null> {
-  const row = await prisma.contract.findUnique({ where: { id } });
-  return row && contractAnalysisSchema.parse(row);
+  return store.get(id);
 }

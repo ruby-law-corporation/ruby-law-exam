@@ -1,30 +1,9 @@
 services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: contracts
-    ports:
-      - '5432:5432'
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d contracts']
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   api:
     build:
       context: .
       dockerfile: docker/api.Dockerfile
     env_file: .env
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/contracts?schema=public
-    depends_on:
-      db:
-        condition: service_healthy
     ports:
       - '3001:3001'
 
@@ -38,6 +17,3 @@ services:
       - api
     ports:
       - '5173:5173'
-
-volumes:
-  db-data:
