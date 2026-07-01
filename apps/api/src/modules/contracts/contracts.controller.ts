@@ -1,26 +1,41 @@
+import {
+  isContractProgressComplete,
+  type ContractProgressEvent,
+} from '@app/core';
 import type { Request, Response } from 'express';
+import { streamJob } from '../jobs/jobs.sse';
+import { getJob } from '../jobs/jobs.store';
 import { ApiError } from '../../platform/http/api-error';
-import { sendPdf } from '../../platform/http/send-pdf';
+import { openSseStream } from '../../platform/http/sse';
+import { sendFile } from '../../platform/http/send-file';
 import {
   generateReportName,
   generateReportPdf,
 } from './contracts.report-service';
-import { analyseContract, getContractById } from './contracts.service';
+import { getContractById, startAnalysis } from './contracts.service';
 
-export async function uploadContract(
-  req: Request,
-  res: Response,
-): Promise<void> {
+export function uploadContract(req: Request, res: Response): void {
   if (!req.file) {
     throw new ApiError(400, 'NO_FILE', 'No file uploaded');
   }
 
-  const result = await analyseContract(
+  const id = startAnalysis(
     req.file.buffer,
     req.file.mimetype,
     req.file.originalname,
   );
-  res.status(201).json({ data: result });
+  res.status(202).json({ data: { id } });
+}
+
+export function streamProgress(
+  req: Request<{ id: string }>,
+  res: Response,
+): void {
+  const job = getJob<ContractProgressEvent>(req.params.id);
+  if (!job) {
+    throw new ApiError(404, 'NOT_FOUND', 'No analysis in progress for this id');
+  }
+  streamJob(job, openSseStream(req, res), isContractProgressComplete);
 }
 
 export async function getContract(
@@ -44,5 +59,5 @@ export async function downloadReport(
   }
 
   const pdf = await generateReportPdf(record);
-  sendPdf(res, pdf, generateReportName(record));
+  sendFile(res, pdf, 'application/pdf', `${generateReportName(record)}.pdf`);
 }

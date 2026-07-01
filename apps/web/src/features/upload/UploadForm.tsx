@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { ReactElement } from 'react';
-import type { ContractAnalysis } from '@app/core';
 import { FileText, Loader2, X } from 'lucide-react';
 import { CONTRACT_UPLOAD_ROUTE } from './constants';
 import { requestData } from '@/shared/api';
@@ -13,15 +12,13 @@ import {
 import { Button, UploadInput } from '@/shared/ui';
 
 interface UploadFormProps {
-  onSuccess: (result: ContractAnalysis) => void;
+  onStarted: (id: string) => void;
   onError: (message: string) => void;
-  onAnalyzingChange: (analyzing: boolean) => void;
 }
 
 export function UploadForm({
-  onSuccess,
+  onStarted,
   onError,
-  onAnalyzingChange,
 }: UploadFormProps): ReactElement {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -43,20 +40,18 @@ export function UploadForm({
   const handleAnalyze = async () => {
     if (!file) return;
     setIsUploading(true);
-    onAnalyzingChange(true);
     onError('');
     try {
-      const result = await requestData<ContractAnalysis>(
-        CONTRACT_UPLOAD_ROUTE,
-        { method: 'POST', body: toFormData({ file }) },
-      );
-      onSuccess(result);
+      const { id } = await requestData<{ id: string }>(CONTRACT_UPLOAD_ROUTE, {
+        method: 'POST',
+        body: toFormData({ file }),
+      });
+      onStarted(id);
       clearFile();
     } catch (error) {
       onError(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setIsUploading(false);
-      onAnalyzingChange(false);
     }
   };
 

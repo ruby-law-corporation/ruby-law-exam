@@ -1,16 +1,14 @@
 import type { ReactElement } from 'react';
-import { CircleAlert, FileSearch, Loader2 } from 'lucide-react';
+import { CircleAlert, FileSearch } from 'lucide-react';
 import { Card, CardContent, EmptyState } from '@/shared/ui';
 
 interface ContractUploadStatusPanelProps {
   error: string;
-  isAnalyzing: boolean;
   hasResult: boolean;
 }
 
 export function ContractUploadStatusPanel({
   error,
-  isAnalyzing,
   hasResult,
 }: ContractUploadStatusPanelProps): ReactElement | null {
   if (error) {
@@ -19,20 +17,6 @@ export function ContractUploadStatusPanel({
         <CircleAlert className="mt-0.5 size-4 shrink-0" />
         {error}
       </div>
-    );
-  }
-  if (isAnalyzing) {
-    return (
-      <Card>
-        <CardContent>
-          <EmptyState
-            icon={Loader2}
-            title="Analyzing your contract…"
-            description="Extracting text and running the AI analysis. This can take a few seconds."
-            className="[&_svg]:animate-spin"
-          />
-        </CardContent>
-      </Card>
     );
   }
   if (!hasResult) {

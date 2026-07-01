@@ -4,6 +4,7 @@ import { validate } from '../../platform/http/validate';
 import {
   downloadReport,
   getContract,
+  streamProgress,
   uploadContract,
 } from './contracts.controller';
 import { contractIdParamsSchema } from './contracts.schema';
@@ -11,10 +12,11 @@ import { uploadMiddleware } from './contracts.upload';
 
 export const contractsRouter = Router();
 
-contractsRouter.post(
-  '/contracts/upload',
-  uploadMiddleware,
-  asyncHandler(uploadContract),
+contractsRouter.post('/contracts/upload', uploadMiddleware, uploadContract);
+contractsRouter.get(
+  '/contracts/:id/progress',
+  validate({ params: contractIdParamsSchema }),
+  streamProgress,
 );
 contractsRouter.get(
   '/contracts/:id',

@@ -14,15 +14,31 @@ vi.mock('./contracts.store', () => ({
   findContractById: vi.fn(),
 }));
 
+import type { ContractProgressEvent } from '@app/core';
+import { getJob } from '../jobs/jobs.store';
 import { analyseText } from './contracts.ai-service';
 import { extractText } from './contracts.extractor-service';
-import { analyseContract, getContractById } from './contracts.service';
+import {
+  analyseContract,
+  getContractById,
+  startAnalysis,
+} from './contracts.service';
 import { findContractById, saveContract } from './contracts.store';
 
 const extractTextMock = vi.mocked(extractText);
 const analyseTextMock = vi.mocked(analyseText);
 const saveContractMock = vi.mocked(saveContract);
 const findContractByIdMock = vi.mocked(findContractById);
+
+const collectStages = (id: string): ContractProgressEvent[] => {
+  const job = getJob<ContractProgressEvent>(id);
+  if (!job) throw new Error(`no job for ${id}`);
+  const events: ContractProgressEvent[] = [job.lastEvent];
+  job.emitter.on('event', (event: ContractProgressEvent) => events.push(event));
+  return events;
+};
+
+const flush = () => new Promise((resolve) => setImmediate(resolve));
 
 describe('contracts.service', () => {
   beforeEach(() => {
@@ -78,5 +94,56 @@ describe('contracts.service', () => {
     await expect(
       analyseContract(Buffer.from('x'), 'application/pdf', 'nda.pdf'),
     ).rejects.toThrow('AI service not implemented yet');
+  });
+
+  it('emits extracting → analysing → done stages for a successful job', async () => {
+    let releaseExtract!: (text: string) => void;
+    extractTextMock.mockReturnValue(
+      new Promise((resolve) => {
+        releaseExtract = resolve;
+      }),
+    );
+    analyseTextMock.mockResolvedValue({
+      isContract: true,
+      type: 'NDA',
+      riskScore: 10,
+      missingClauses: [],
+      recommendations: [],
+      riskyClauses: [],
+    });
+
+    const id = startAnalysis(Buffer.from('x'), 'application/pdf', 'nda.pdf');
+    const stages = collectStages(id);
+    releaseExtract('contract text');
+    await flush();
+
+    expect(stages.map((event) => event.stage)).toEqual([
+      'extracting',
+      'analysing',
+      'done',
+    ]);
+    expect(saveContractMock).toHaveBeenCalledWith(
+      expect.objectContaining({ id, filename: 'nda.pdf' }),
+    );
+  });
+
+  it('emits an error stage when the AI service is unavailable', async () => {
+    let releaseExtract!: (text: string) => void;
+    extractTextMock.mockReturnValue(
+      new Promise((resolve) => {
+        releaseExtract = resolve;
+      }),
+    );
+    analyseTextMock.mockRejectedValue(new Error('AI service is down'));
+
+    const id = startAnalysis(Buffer.from('x'), 'application/pdf', 'nda.pdf');
+    const stages = collectStages(id);
+    releaseExtract('contract text');
+    await flush();
+
+    expect(stages.at(-1)).toEqual({
+      stage: 'error',
+      message: 'AI service is down',
+    });
   });
 });

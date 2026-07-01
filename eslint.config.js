@@ -8,7 +8,12 @@ import reactConfig from './packages/eslint-config/react.js';
 // them, scoping the React rules to the web app and the base rules elsewhere.
 export default defineConfig([
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**', '**/build/**'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/coverage/**',
+      '**/build/**',
+    ],
   },
   {
     files: ['apps/web/**/*.{ts,tsx,js,jsx}'],

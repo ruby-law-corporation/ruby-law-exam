@@ -2,9 +2,15 @@ import { useState } from 'react';
 import type { ReactElement } from 'react';
 import type { ContractAnalysis } from '@app/core';
 import { ContractUploadStatusPanel } from './ContractUploadStatusPanel';
-import { AnalysisResults } from '@/features/analysis';
+import {
+  AnalysisResults,
+  AnalysisProgress,
+  CONTRACT_DETAIL_ROUTE,
+} from '@/features/analysis';
 import { HighlightedContract } from '@/features/highlighting';
 import { UploadForm } from '@/features/upload';
+import { requestData } from '@/shared/api';
+import { generatePath } from '@/shared/lib';
 import {
   Card,
   CardContent,
@@ -16,14 +22,31 @@ import {
 export function ContractUploadPage(): ReactElement {
   const [result, setResult] = useState<ContractAnalysis | null>(null);
   const [error, setError] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
 
-  const handleSuccess = (analysis: ContractAnalysis) => {
-    setResult(analysis);
+  const handleStarted = (id: string) => {
+    setResult(null);
     setError('');
+    setAnalyzingId(id);
   };
 
-  const showResult = !isAnalyzing && result;
+  const handleError = (message: string) => {
+    setError(message);
+    setAnalyzingId(null);
+  };
+
+  const handleDone = async (id: string) => {
+    try {
+      setResult(
+        await requestData<ContractAnalysis>(
+          generatePath(CONTRACT_DETAIL_ROUTE, { id }),
+        ),
+      );
+      setAnalyzingId(null);
+    } catch (err) {
+      handleError(err instanceof Error ? err.message : 'Analysis failed');
+    }
+  };
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-12">
@@ -44,21 +67,21 @@ export function ContractUploadPage(): ReactElement {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <UploadForm
-              onSuccess={handleSuccess}
-              onError={setError}
-              onAnalyzingChange={setIsAnalyzing}
-            />
+            <UploadForm onStarted={handleStarted} onError={handleError} />
           </CardContent>
         </Card>
 
-        <ContractUploadStatusPanel
-          error={error}
-          isAnalyzing={isAnalyzing}
-          hasResult={result !== null}
-        />
+        {analyzingId ? (
+          <AnalysisProgress
+            id={analyzingId}
+            onDone={() => handleDone(analyzingId)}
+            onError={handleError}
+          />
+        ) : (
+          <ContractUploadStatusPanel error={error} hasResult={!!result} />
+        )}
 
-        {showResult && (
+        {!analyzingId && result && (
           <div className="space-y-4">
             <AnalysisResults result={result} />
             {result.isContract && result.fullText && (

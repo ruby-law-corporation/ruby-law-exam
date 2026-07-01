@@ -9,11 +9,7 @@ describe('UploadForm', () => {
   it('reports a validation error when an unsupported file is selected', () => {
     const onError = vi.fn();
     const { container } = render(
-      <UploadForm
-        onSuccess={vi.fn()}
-        onError={onError}
-        onAnalyzingChange={vi.fn()}
-      />,
+      <UploadForm onStarted={vi.fn()} onError={onError} />,
     );
     const input =
       container.querySelector<HTMLInputElement>('input[type="file"]');
@@ -27,13 +23,7 @@ describe('UploadForm', () => {
   });
 
   it('disables the analyze button until a valid file is chosen', () => {
-    render(
-      <UploadForm
-        onSuccess={vi.fn()}
-        onError={vi.fn()}
-        onAnalyzingChange={vi.fn()}
-      />,
-    );
+    render(<UploadForm onStarted={vi.fn()} onError={vi.fn()} />);
     expect(
       screen.getByRole('button', { name: /analyze contract/i }),
     ).toBeDisabled();
