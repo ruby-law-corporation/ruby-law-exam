@@ -42,10 +42,12 @@ A pnpm + Turborepo monorepo. Apps live under `apps/`, shared packages under `pac
 │   │       ├── platform/http/  # ApiError, async handler, error handler
 │   │       └── modules/
 │   │           └── contracts/  # routes → controller → service → ai/extractor/store
-│   └── web/                # React + Vite + TypeScript (@app/web)
+│   └── web/                # React + Vite + TypeScript (@app/web), feature-sliced
 │       └── src/
-│           ├── components/
-│           └── pages/
+│           ├── app/             # app shell, global styles
+│           ├── pages/           # route-level pages
+│           ├── features/        # feature slices (contract-analysis)
+│           └── shared/          # shared api, lib, ui
 ├── packages/
 │   ├── types/              # @app/types — shared Zod schemas + inferred types
 │   └── eslint-config/      # @app/eslint-config — shared flat ESLint config (base + react)
@@ -76,12 +78,13 @@ git checkout -b candidate/<your-github-username>
 # 3. Install all workspace dependencies from the repo root
 pnpm install
 
-# 4. Generate the Prisma client (it is gitignored)
-pnpm db:generate
-
-# 5. Set up environment variables (single .env at the repo root)
+# 4. Set up environment variables (single .env at the repo root)
 cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
+# Edit .env and add your OPENAI_API_KEY (DATABASE_URL is pre-filled for the Docker Postgres)
+
+# 5. Generate the Prisma client (it is gitignored; `pnpm dev` does NOT auto-generate it,
+#    though `pnpm build` / `pnpm typecheck` do)
+pnpm db:generate
 
 # 6. Run everything: start Postgres, sync the schema, then API + web
 pnpm dev:with-db

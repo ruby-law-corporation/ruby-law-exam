@@ -43,7 +43,6 @@ describe('contracts.service', () => {
       'application/pdf',
       'nda.pdf',
     );
-
     expect(result).toMatchObject({
       type: 'NDA',
       riskScore: 42,
@@ -51,7 +50,6 @@ describe('contracts.service', () => {
     });
     expect(result.id).toBeTruthy();
     expect(saveContractMock).toHaveBeenCalledWith(result);
-
     findContractByIdMock.mockResolvedValue(result);
     expect(await getContractById(result.id)).toEqual(result);
   });
@@ -61,7 +59,6 @@ describe('contracts.service', () => {
     analyseTextMock.mockRejectedValue(
       new Error('AI service not implemented yet'),
     );
-
     await expect(
       analyseContract(Buffer.from('x'), 'application/pdf', 'nda.pdf'),
     ).rejects.toThrow('AI service not implemented yet');
