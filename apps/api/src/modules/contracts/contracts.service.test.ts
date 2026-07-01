@@ -32,6 +32,7 @@ describe('contracts.service', () => {
   it('returns a stored ContractAnalysis when extraction and AI succeed', async () => {
     extractTextMock.mockResolvedValue('Some contract text');
     analyseTextMock.mockResolvedValue({
+      isContract: true,
       type: 'NDA',
       riskScore: 42,
       missingClauses: ['Confidentiality term'],

@@ -11,6 +11,7 @@ datasource db {
 model Contract {
   id              String   @id
   filename        String
+  isContract      Boolean
   type            String
   riskScore       Int
   missingClauses  String[]

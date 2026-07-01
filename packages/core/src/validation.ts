@@ -9,6 +9,7 @@ export const contractTypeSchema = z.enum([
 ]);
 
 export const contractAIResultSchema = z.object({
+  isContract: z.boolean(),
   type: contractTypeSchema,
   riskScore: z.number().min(0).max(100),
   missingClauses: z.array(z.string()),

@@ -22,9 +22,35 @@ interface AnalysisResultsProps {
 export function AnalysisResults({
   result,
 }: AnalysisResultsProps): ReactElement {
-  const { id, type, riskScore, missingClauses, recommendations, filename } =
-    result;
+  const {
+    id,
+    isContract,
+    type,
+    riskScore,
+    missingClauses,
+    recommendations,
+    filename,
+  } = result;
   const risk = getRiskLevel(riskScore);
+
+  if (!isContract) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <CircleAlert className="size-4 text-warning" />
+            Not a contract
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            "{filename}" doesn't appear to be a legal contract, so it wasn't
+            analysed.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-4">

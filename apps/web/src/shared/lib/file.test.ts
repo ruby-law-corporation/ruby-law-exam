@@ -27,6 +27,11 @@ describe('validateFile', () => {
     );
     expect(validateFile(file)).toMatch(/exceeds/);
   });
+
+  it('accepts by extension when the MIME type is missing', () => {
+    const file = makeFile('contract.docx', '', 1024);
+    expect(validateFile(file)).toBeNull();
+  });
 });
 
 describe('formatFileSize', () => {
@@ -36,5 +41,9 @@ describe('formatFileSize', () => {
 
   it('formats sub-megabyte sizes as kilobytes', () => {
     expect(formatFileSize(500 * 1024)).toBe('500 KB');
+  });
+
+  it('floors tiny sizes at 1 KB', () => {
+    expect(formatFileSize(1)).toBe('1 KB');
   });
 });
