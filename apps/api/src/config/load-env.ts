@@ -6,6 +6,5 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const apiRoot = path.resolve(dirname, '../..');
 const workspaceRoot = path.resolve(apiRoot, '../..');
 
-// Local app-level .env takes precedence, then the shared workspace-root .env.
-dotenv.config({ path: path.join(apiRoot, '.env') });
-dotenv.config({ path: path.join(workspaceRoot, '.env') });
+dotenv.config({ path: path.join(apiRoot, '.env'), quiet: true });
+dotenv.config({ path: path.join(workspaceRoot, '.env'), quiet: true });

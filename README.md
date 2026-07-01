@@ -76,28 +76,43 @@ git checkout -b candidate/<your-github-username>
 # 3. Install all workspace dependencies from the repo root
 pnpm install
 
-# 4. Set up environment variables (single .env at the repo root)
+# 4. Generate the Prisma client (it is gitignored)
+pnpm db:generate
+
+# 5. Set up environment variables (single .env at the repo root)
 cp .env.example .env
 # Edit .env and add your OPENAI_API_KEY
 
-# 5. Run both API (port 3001) and web (port 5173) together
-pnpm dev
-# …or individually:
+# 6. Run everything: start Postgres, sync the schema, then API + web
+pnpm dev:with-db
+# …or run the pieces yourself:
+docker compose up -d db   # Postgres on :5432
+pnpm db:push              # sync the Prisma schema
+pnpm dev                  # API on :3001, web on :5173
+# …or a single app:
 pnpm dev:api
 pnpm dev:web
 ```
 
+> The API persists contracts in Postgres via Prisma. `pnpm dev:with-db` brings up the
+> `db` service, runs `prisma db push`, then starts both apps. Plain `pnpm dev` skips the
+> database, so uploads and `GET /api/contracts/:id` will fail until Postgres is running.
+
 ### Workspace commands (run from the repo root)
 
-| Command          | Description                              |
-| ---------------- | ---------------------------------------- |
-| `pnpm dev`       | Run API + web in parallel                |
-| `pnpm build`     | Build all apps                           |
-| `pnpm typecheck` | Type-check every package                 |
-| `pnpm lint`      | ESLint across the workspace              |
-| `pnpm test`      | Run unit tests (Vitest)                  |
-| `pnpm format`    | Prettier write                           |
-| `pnpm docker:up` | Build & run API + web via Docker Compose |
+| Command            | Description                                     |
+| ------------------ | ----------------------------------------------- |
+| `pnpm dev:with-db` | Start Postgres, sync the schema, then API + web |
+| `pnpm dev`         | Run API + web in parallel (no database)         |
+| `pnpm build`       | Build all apps                                  |
+| `pnpm typecheck`   | Type-check every package                        |
+| `pnpm lint`        | ESLint across the workspace                     |
+| `pnpm test`        | Run unit tests (Vitest)                         |
+| `pnpm format`      | Prettier write                                  |
+| `pnpm db:generate` | Generate the Prisma client                      |
+| `pnpm db:push`     | Sync the Prisma schema to a running Postgres    |
+| `pnpm db:studio`   | Open Prisma Studio (browse the database)        |
+| `pnpm docker:up`   | Build & run API + web via Docker Compose        |
 
 ### Docker
 

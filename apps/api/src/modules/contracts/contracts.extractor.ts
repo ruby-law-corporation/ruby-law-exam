@@ -1,22 +1,48 @@
-// TODO: extract text from PDF and DOCX buffers (e.g. pdf-parse, mammoth).
+import mammoth from 'mammoth';
+import { PDFParse } from 'pdf-parse';
+import { ApiError } from '../../platform/http/api-error';
 
 export const PDF_MIME = 'application/pdf';
 export const DOCX_MIME =
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
+const PARSERS: Record<string, (buffer: Buffer) => Promise<string>> = {
+  [PDF_MIME]: async (buffer) => {
+    const parser = new PDFParse({ data: buffer });
+    return parser
+      .getText()
+      .then((result) => result.text)
+      .finally(() => parser.destroy());
+  },
+  [DOCX_MIME]: async (buffer) =>
+    (await mammoth.extractRawText({ buffer })).value,
+};
+
 export async function extractText(
-  _buffer: Buffer,
+  buffer: Buffer,
   mimetype: string,
 ): Promise<string> {
-  if (mimetype === PDF_MIME) {
-    // TODO: use pdf-parse to extract text
-    throw new Error('PDF extraction not implemented yet');
+  const parse = PARSERS[mimetype];
+  if (!parse) {
+    throw new ApiError(
+      415,
+      'UNSUPPORTED_FILE_TYPE',
+      `Unsupported file type: ${mimetype}`,
+    );
   }
 
-  if (mimetype === DOCX_MIME) {
-    // TODO: use mammoth to extract text
-    throw new Error('DOCX extraction not implemented yet');
+  const text = await parse(buffer).catch(() => {
+    throw new ApiError(422, 'PARSE_FAILED', 'The document could not be parsed');
+  });
+
+  const trimmed = text.trim();
+  if (!trimmed) {
+    throw new ApiError(
+      422,
+      'EMPTY_CONTRACT',
+      'No readable text could be extracted from the document',
+    );
   }
 
-  throw new Error(`Unsupported file type: ${mimetype}`);
+  return trimmed;
 }

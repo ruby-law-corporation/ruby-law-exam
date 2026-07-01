@@ -38,3 +38,6 @@ services:
       - api
     ports:
       - '5173:5173'
+
+volumes:
+  db-data:
