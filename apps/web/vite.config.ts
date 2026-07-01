@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -7,8 +8,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(dirname, '../..');
 
 export default defineConfig({
-  plugins: [react()],
-  // Read env from the workspace root so a single .env serves the whole repo.
+  plugins: [react(), tailwindcss()],
   envDir: root,
   resolve: {
     alias: {
