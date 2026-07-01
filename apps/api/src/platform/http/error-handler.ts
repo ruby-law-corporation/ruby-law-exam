@@ -1,6 +1,7 @@
 import { MAX_FILE_SIZE_MB } from '@app/types';
 import type { NextFunction, Request, Response } from 'express';
 import { MulterError } from 'multer';
+import { ZodError } from 'zod';
 import { ApiError } from './api-error';
 
 export function errorHandler(
@@ -13,6 +14,20 @@ export function errorHandler(
     res
       .status(err.statusCode)
       .json({ error: { code: err.code, message: err.message } });
+    return;
+  }
+
+  if (err instanceof ZodError) {
+    res.status(400).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Request validation failed',
+        details: err.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: issue.message,
+        })),
+      },
+    });
     return;
   }
 
