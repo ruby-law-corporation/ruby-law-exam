@@ -1,4 +1,4 @@
-export type RiskSeverity = 'low' | 'medium' | 'high';
+import type { RiskSeverity } from './types';
 
 export const RISK_THRESHOLDS = { high: 70, medium: 40 } as const;
 

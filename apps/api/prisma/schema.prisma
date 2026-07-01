@@ -16,5 +16,7 @@ model Contract {
   riskScore       Int
   missingClauses  String[]
   recommendations String[]
+  riskyClauses    Json
+  fullText        String
   createdAt       String
 }

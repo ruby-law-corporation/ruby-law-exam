@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import type { ContractAnalysis } from '@app/core';
 import { CheckCircle2, CircleAlert, Download, Lightbulb } from 'lucide-react';
-import { CONTRACT_ROUTES } from './constants';
+import { CONTRACT_REPORT_ROUTE } from './constants';
 import { getRiskLevel } from './riskLevel';
 import { generatePath } from '@/shared/lib';
 import {
@@ -67,7 +67,7 @@ export function AnalysisResults({
               variant="outline"
               render={
                 <a
-                  href={generatePath(CONTRACT_ROUTES.report, { id })}
+                  href={generatePath(CONTRACT_REPORT_ROUTE, { id })}
                   download
                 />
               }

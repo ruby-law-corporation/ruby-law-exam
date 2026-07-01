@@ -9,12 +9,13 @@ export async function analyseContract(
   mimetype: string,
   filename: string,
 ): Promise<ContractAnalysis> {
-  const text = await extractText(buffer, mimetype);
-  const analysis = await analyseText(text);
+  const fullText = await extractText(buffer, mimetype);
+  const analysis = await analyseText(fullText);
 
   const record: ContractAnalysis = {
     id: uuidv4(),
     filename,
+    fullText,
     ...analysis,
     createdAt: new Date().toISOString(),
   };

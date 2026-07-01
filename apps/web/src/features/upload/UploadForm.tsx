@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { ReactElement } from 'react';
 import type { ContractAnalysis } from '@app/core';
 import { FileText, Loader2, X } from 'lucide-react';
-import { CONTRACT_ROUTES } from './constants';
+import { CONTRACT_UPLOAD_ROUTE } from './constants';
 import { requestData } from '@/shared/api';
 import {
   ACCEPTED_EXTENSIONS,
@@ -47,7 +47,7 @@ export function UploadForm({
     onError('');
     try {
       const result = await requestData<ContractAnalysis>(
-        CONTRACT_ROUTES.upload,
+        CONTRACT_UPLOAD_ROUTE,
         { method: 'POST', body: toFormData({ file }) },
       );
       onSuccess(result);

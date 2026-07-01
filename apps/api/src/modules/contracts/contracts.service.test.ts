@@ -37,6 +37,13 @@ describe('contracts.service', () => {
       riskScore: 42,
       missingClauses: ['Confidentiality term'],
       recommendations: ['Add a defined term length'],
+      riskyClauses: [
+        {
+          text: 'unlimited liability',
+          severity: 'high',
+          reason: 'Exposes the party to uncapped damages',
+        },
+      ],
     });
 
     const result = await analyseContract(
@@ -48,6 +55,14 @@ describe('contracts.service', () => {
       type: 'NDA',
       riskScore: 42,
       filename: 'nda.pdf',
+      fullText: 'Some contract text',
+      riskyClauses: [
+        {
+          text: 'unlimited liability',
+          severity: 'high',
+          reason: 'Exposes the party to uncapped damages',
+        },
+      ],
     });
     expect(result.id).toBeTruthy();
     expect(saveContractMock).toHaveBeenCalledWith(result);

@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import type { ReactElement } from 'react';
 import type { ContractAnalysis } from '@app/core';
-import { CircleAlert, FileSearch, Loader2 } from 'lucide-react';
-import { AnalysisResults, UploadForm } from '@/features/contract-analysis';
+import { ContractUploadStatusPanel } from './ContractUploadStatusPanel';
+import { AnalysisResults } from '@/features/analysis';
+import { HighlightedContract } from '@/features/highlighting';
+import { UploadForm } from '@/features/upload';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  EmptyState,
 } from '@/shared/ui';
 
 export function ContractUploadPage(): ReactElement {
@@ -21,6 +22,8 @@ export function ContractUploadPage(): ReactElement {
     setResult(analysis);
     setError('');
   };
+
+  const showResult = !isAnalyzing && result;
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-12">
@@ -49,38 +52,22 @@ export function ContractUploadPage(): ReactElement {
           </CardContent>
         </Card>
 
-        {error && (
-          <div className="flex items-start gap-2 rounded-md border border-destructive/35 bg-destructive/10 p-4 text-sm text-destructive">
-            <CircleAlert className="mt-0.5 size-4 shrink-0" />
-            {error}
+        <ContractUploadStatusPanel
+          error={error}
+          isAnalyzing={isAnalyzing}
+          hasResult={result !== null}
+        />
+
+        {showResult && (
+          <div className="space-y-4">
+            <AnalysisResults result={result} />
+            {result.isContract && result.fullText && (
+              <HighlightedContract
+                fullText={result.fullText}
+                riskyClauses={result.riskyClauses}
+              />
+            )}
           </div>
-        )}
-
-        {isAnalyzing && (
-          <Card>
-            <CardContent>
-              <EmptyState
-                icon={Loader2}
-                title="Analyzing your contract…"
-                description="Extracting text and running the AI analysis. This can take a few seconds."
-                className="[&_svg]:animate-spin"
-              />
-            </CardContent>
-          </Card>
-        )}
-
-        {!isAnalyzing && result && <AnalysisResults result={result} />}
-
-        {!isAnalyzing && !result && !error && (
-          <Card>
-            <CardContent>
-              <EmptyState
-                icon={FileSearch}
-                title="No analysis yet"
-                description="Upload a contract above to see its risk score, missing clauses, and recommendations."
-              />
-            </CardContent>
-          </Card>
         )}
       </div>
     </main>
