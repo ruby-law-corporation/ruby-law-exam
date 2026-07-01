@@ -1,18 +1,19 @@
-import type { VariantProps } from 'class-variance-authority';
-import type { badgeVariants } from '@/shared/ui';
-
-type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>;
+import { getRiskLevel as getSharedRiskLevel } from '@app/core';
+import type { RiskSeverity } from '@app/core';
 
 interface RiskLevel {
   label: string;
-  badge: Extract<BadgeVariant, 'low' | 'medium' | 'high'>;
+  badge: RiskSeverity;
   bar: string;
 }
 
+const RISK_BARS: Record<RiskSeverity, string> = {
+  high: 'bg-destructive',
+  medium: 'bg-warning',
+  low: 'bg-success',
+};
+
 export const getRiskLevel = (score: number): RiskLevel => {
-  if (score >= 70)
-    return { label: 'High risk', badge: 'high', bar: 'bg-destructive' };
-  if (score >= 40)
-    return { label: 'Medium risk', badge: 'medium', bar: 'bg-warning' };
-  return { label: 'Low risk', badge: 'low', bar: 'bg-success' };
+  const { severity, label } = getSharedRiskLevel(score);
+  return { label, badge: severity, bar: RISK_BARS[severity] };
 };

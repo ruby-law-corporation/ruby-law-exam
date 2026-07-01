@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('./contracts.extractor', () => ({
+vi.mock('./contracts.extractor-service', () => ({
   extractText: vi.fn(),
   PDF_MIME: 'application/pdf',
   DOCX_MIME:
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 }));
-vi.mock('./contracts.ai', () => ({
+vi.mock('./contracts.ai-service', () => ({
   analyseText: vi.fn(),
 }));
 vi.mock('./contracts.store', () => ({
@@ -14,8 +14,8 @@ vi.mock('./contracts.store', () => ({
   findContractById: vi.fn(),
 }));
 
-import { analyseText } from './contracts.ai';
-import { extractText } from './contracts.extractor';
+import { analyseText } from './contracts.ai-service';
+import { extractText } from './contracts.extractor-service';
 import { analyseContract, getContractById } from './contracts.service';
 import { findContractById, saveContract } from './contracts.store';
 

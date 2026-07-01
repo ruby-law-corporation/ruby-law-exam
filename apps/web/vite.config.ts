@@ -13,7 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(dirname, 'src'),
-      '@app/types': path.resolve(root, 'packages/types/src/index.ts'),
+      '@app/core': path.resolve(root, 'packages/core/src/index.ts'),
     },
   },
   server: {

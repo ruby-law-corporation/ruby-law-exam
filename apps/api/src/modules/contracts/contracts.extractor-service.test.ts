@@ -15,7 +15,11 @@ vi.mock('mammoth', () => ({
   default: { extractRawText: extractRawTextMock },
 }));
 
-import { DOCX_MIME, PDF_MIME, extractText } from './contracts.extractor';
+import {
+  DOCX_MIME,
+  PDF_MIME,
+  extractText,
+} from './contracts.extractor-service';
 
 describe('extractText', () => {
   beforeEach(() => {

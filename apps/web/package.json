@@ -12,7 +12,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@app/types": "workspace:*",
+    "@app/core": "workspace:*",
     "@base-ui/react": "^1.5.0",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/playfair-display": "^5.2.8",

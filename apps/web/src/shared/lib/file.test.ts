@@ -1,4 +1,4 @@
-import { MAX_FILE_SIZE_BYTES } from '@app/types';
+import { MAX_FILE_SIZE_BYTES } from '@app/core';
 import { describe, expect, it } from 'vitest';
 import { formatFileSize, validateFile } from './file';
 

@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.110",
-    "@app/types": "workspace:*",
+    "@app/core": "workspace:*",
     "@prisma/client": "^6.19.3",
     "ai": "^5.0.209",
     "cors": "^2.8.5",
@@ -25,6 +25,7 @@
     "mammoth": "^1.9.0",
     "multer": "^2.2.0",
     "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.19.1",
     "uuid": "^14.0.1",
     "zod": "^4.4.3"
   },
@@ -33,6 +34,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
     "@types/multer": "^2.1.0",
+    "@types/pdfkit": "^0.17.6",
     "esbuild": "^0.28.1",
     "eslint": "^10.6.0",
     "prisma": "^6.19.3",

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import type { ReactElement } from 'react';
-import type { ContractAnalysis } from '@app/types';
+import type { ContractAnalysis } from '@app/core';
 import { FileText, Loader2, X } from 'lucide-react';
-import { uploadContract } from './api';
+import { CONTRACT_ROUTES } from './constants';
+import { requestData } from '@/shared/api';
 import {
   ACCEPTED_EXTENSIONS,
   formatFileSize,
+  toFormData,
   validateFile,
 } from '@/shared/lib';
 import { Button, UploadInput } from '@/shared/ui';
@@ -44,7 +46,10 @@ export function UploadForm({
     onAnalyzingChange(true);
     onError('');
     try {
-      const result = await uploadContract(file);
+      const result = await requestData<ContractAnalysis>(
+        CONTRACT_ROUTES.upload,
+        { method: 'POST', body: toFormData({ file }) },
+      );
       onSuccess(result);
       clearFile();
     } catch (error) {

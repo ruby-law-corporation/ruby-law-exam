@@ -1,4 +1,4 @@
-import { MAX_FILE_SIZE_MB } from '@app/types';
+import { MAX_FILE_SIZE_MB } from '@app/core';
 import type { NextFunction, Request, Response } from 'express';
 import { MulterError } from 'multer';
 import { ZodError } from 'zod';

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { ContractAnalysis } from '@app/types';
-import { analyseText } from './contracts.ai';
-import { extractText } from './contracts.extractor';
+import type { ContractAnalysis } from '@app/core';
+import { analyseText } from './contracts.ai-service';
+import { extractText } from './contracts.extractor-service';
 import { findContractById, saveContract } from './contracts.store';
 
 export async function analyseContract(

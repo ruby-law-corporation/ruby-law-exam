@@ -1,10 +1,14 @@
 import type { ReactElement } from 'react';
-import type { ContractAnalysis } from '@app/types';
-import { CheckCircle2, CircleAlert, Lightbulb } from 'lucide-react';
+import type { ContractAnalysis } from '@app/core';
+import { CheckCircle2, CircleAlert, Download, Lightbulb } from 'lucide-react';
+import { CONTRACT_ROUTES } from './constants';
 import { getRiskLevel } from './riskLevel';
+import { generatePath } from '@/shared/lib';
 import {
   Badge,
+  Button,
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -18,7 +22,8 @@ interface AnalysisResultsProps {
 export function AnalysisResults({
   result,
 }: AnalysisResultsProps): ReactElement {
-  const { type, riskScore, missingClauses, recommendations, filename } = result;
+  const { id, type, riskScore, missingClauses, recommendations, filename } =
+    result;
   const risk = getRiskLevel(riskScore);
 
   return (
@@ -31,6 +36,20 @@ export function AnalysisResults({
               {type}
             </Badge>
           </CardTitle>
+          <CardAction>
+            <Button
+              variant="outline"
+              render={
+                <a
+                  href={generatePath(CONTRACT_ROUTES.report, { id })}
+                  download
+                />
+              }
+            >
+              <Download />
+              Download report
+            </Button>
+          </CardAction>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between">

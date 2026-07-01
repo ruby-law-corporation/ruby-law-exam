@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ReactElement } from 'react';
-import type { ContractAnalysis } from '@app/types';
+import type { ContractAnalysis } from '@app/core';
 import { CircleAlert, FileSearch, Loader2 } from 'lucide-react';
 import { AnalysisResults, UploadForm } from '@/features/contract-analysis';
 import {

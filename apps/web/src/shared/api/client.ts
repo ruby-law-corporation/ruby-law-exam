@@ -1,4 +1,4 @@
-import type { ApiError, ApiSuccess } from '@app/types';
+import type { ApiError, ApiSuccess } from '@app/core';
 
 export async function requestData<T>(
   input: string,

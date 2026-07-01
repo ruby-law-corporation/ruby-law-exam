@@ -1,7 +1,7 @@
-import { MAX_FILE_SIZE_BYTES } from '@app/types';
+import { MAX_FILE_SIZE_BYTES } from '@app/core';
 import multer from 'multer';
 import { ApiError } from '../../platform/http/api-error';
-import { DOCX_MIME, PDF_MIME } from './contracts.extractor';
+import { DOCX_MIME, PDF_MIME } from './contracts.extractor-service';
 
 export const uploadMiddleware = multer({
   storage: multer.memoryStorage(),

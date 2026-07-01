@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import { asyncHandler } from '../../platform/http/async-handler';
 import { validate } from '../../platform/http/validate';
-import { getContract, uploadContract } from './contracts.controller';
+import {
+  downloadReport,
+  getContract,
+  uploadContract,
+} from './contracts.controller';
 import { contractIdParamsSchema } from './contracts.schema';
 import { uploadMiddleware } from './contracts.upload';
 
@@ -16,4 +20,9 @@ contractsRouter.get(
   '/contracts/:id',
   validate({ params: contractIdParamsSchema }),
   asyncHandler(getContract),
+);
+contractsRouter.get(
+  '/contracts/:id/report',
+  validate({ params: contractIdParamsSchema }),
+  asyncHandler(downloadReport),
 );

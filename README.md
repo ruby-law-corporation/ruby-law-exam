@@ -49,7 +49,7 @@ A pnpm + Turborepo monorepo. Apps live under `apps/`, shared packages under `pac
 │           ├── features/        # feature slices (contract-analysis)
 │           └── shared/          # shared api, lib, ui
 ├── packages/
-│   ├── types/              # @app/types — shared Zod schemas + inferred types
+│   ├── core/               # @app/core — shared Zod schemas, types, constants, domain logic
 │   └── eslint-config/      # @app/eslint-config — shared flat ESLint config (base + react)
 ├── docker/                 # Dockerfiles for the api + web images
 ├── docker-compose.yml      # Run API + web together

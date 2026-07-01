@@ -4,7 +4,7 @@
     "lib": ["ES2022"],
     "types": ["node"],
     "paths": {
-      "@app/types": ["../../packages/types/src/index.ts"]
+      "@app/core": ["../../packages/core/src/index.ts"]
     }
   },
   "include": ["src"],

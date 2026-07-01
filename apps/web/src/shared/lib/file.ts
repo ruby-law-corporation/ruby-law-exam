@@ -1,4 +1,4 @@
-import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '@app/types';
+import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '@app/core';
 
 const PDF_MIME = 'application/pdf';
 const DOCX_MIME =

@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { contractAIResultSchema, type ContractAIResult } from '@app/types';
+import { contractAIResultSchema, type ContractAIResult } from '@app/core';
 import { generateObject } from 'ai';
 import { env } from '../../config/env';
 import { ApiError } from '../../platform/http/api-error';
