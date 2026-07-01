@@ -40,6 +40,16 @@ const collectStages = (id: string): ContractProgressEvent[] => {
 
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
+const makeFile = (
+  overrides: Partial<Express.Multer.File> = {},
+): Express.Multer.File =>
+  ({
+    buffer: Buffer.from('x'),
+    mimetype: 'application/pdf',
+    originalname: 'nda.pdf',
+    ...overrides,
+  }) as Express.Multer.File;
+
 describe('contracts.service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -62,11 +72,7 @@ describe('contracts.service', () => {
       ],
     });
 
-    const result = await analyseContract(
-      Buffer.from('x'),
-      'application/pdf',
-      'nda.pdf',
-    );
+    const result = await analyseContract(makeFile());
     expect(result).toMatchObject({
       type: 'NDA',
       riskScore: 42,
@@ -91,9 +97,9 @@ describe('contracts.service', () => {
     analyseTextMock.mockRejectedValue(
       new Error('AI service not implemented yet'),
     );
-    await expect(
-      analyseContract(Buffer.from('x'), 'application/pdf', 'nda.pdf'),
-    ).rejects.toThrow('AI service not implemented yet');
+    await expect(analyseContract(makeFile())).rejects.toThrow(
+      'AI service not implemented yet',
+    );
   });
 
   it('emits extracting → analysing → done stages for a successful job', async () => {
@@ -112,7 +118,7 @@ describe('contracts.service', () => {
       riskyClauses: [],
     });
 
-    const id = startAnalysis(Buffer.from('x'), 'application/pdf', 'nda.pdf');
+    const id = startAnalysis(makeFile());
     const stages = collectStages(id);
     releaseExtract('contract text');
     await flush();
@@ -136,7 +142,7 @@ describe('contracts.service', () => {
     );
     analyseTextMock.mockRejectedValue(new Error('AI service is down'));
 
-    const id = startAnalysis(Buffer.from('x'), 'application/pdf', 'nda.pdf');
+    const id = startAnalysis(makeFile());
     const stages = collectStages(id);
     releaseExtract('contract text');
     await flush();

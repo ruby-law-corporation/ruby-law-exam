@@ -10,49 +10,39 @@ type ProgressJob = Job<ContractProgressEvent>;
 const JOB_RETENTION_MS = 30_000;
 
 export async function analyseContract(
-  buffer: Buffer,
-  mimetype: string,
-  filename: string,
+  file: Express.Multer.File,
   id: string = uuidv4(),
   onStage: (stage: 'extracting' | 'analysing') => void = () => {},
 ): Promise<ContractAnalysis> {
   onStage('extracting');
-  const fullText = await extractText(buffer, mimetype);
+  const fullText = await extractText(file.buffer, file.mimetype);
 
   onStage('analysing');
   const analysis = await analyseText(fullText);
 
   return saveContract({
     id,
-    filename,
+    filename: file.originalname,
     fullText,
     ...analysis,
     createdAt: new Date().toISOString(),
   });
 }
 
-export function startAnalysis(
-  buffer: Buffer,
-  mimetype: string,
-  filename: string,
-): string {
+export function startAnalysis(file: Express.Multer.File): string {
   const id = uuidv4();
   const job = createJob<ContractProgressEvent>(id, { stage: 'uploading' });
-  void runAnalysis(id, job, buffer, mimetype, filename);
+  void runAnalysis(id, job, file);
   return id;
 }
 
 async function runAnalysis(
   id: string,
   job: ProgressJob,
-  buffer: Buffer,
-  mimetype: string,
-  filename: string,
+  file: Express.Multer.File,
 ): Promise<void> {
   try {
-    await analyseContract(buffer, mimetype, filename, id, (stage) =>
-      emitEvent(job, { stage }),
-    );
+    await analyseContract(file, id, (stage) => emitEvent(job, { stage }));
     emitEvent(job, { stage: 'done' });
   } catch (error) {
     emitEvent(job, {

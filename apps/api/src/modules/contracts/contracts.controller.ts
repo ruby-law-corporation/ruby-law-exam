@@ -19,11 +19,7 @@ export function uploadContract(req: Request, res: Response): void {
     throw new ApiError(400, 'NO_FILE', 'No file uploaded');
   }
 
-  const id = startAnalysis(
-    req.file.buffer,
-    req.file.mimetype,
-    req.file.originalname,
-  );
+  const id = startAnalysis(req.file);
   res.status(202).json({ data: { id } });
 }
 
