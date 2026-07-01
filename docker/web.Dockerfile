@@ -1,14 +1,15 @@
-FROM node:22-alpine
+FROM node:22-alpine AS build
 RUN corepack enable
 WORKDIR /repo
 
 COPY . .
 RUN pnpm install --frozen-lockfile
-
-# Vite inlines VITE_* at build time, so it comes in as a build arg (from .env via compose).
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
 RUN pnpm --filter @app/web build
 
-EXPOSE 5173
-CMD ["pnpm", "--filter", "@app/web", "preview"]
+FROM nginx:1.27-alpine AS runtime
+COPY docker/web.nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=build /repo/apps/web/dist /usr/share/nginx/html
+
+ENV API_HOST=api
+ENV API_PORT=3001
+EXPOSE 8080
