@@ -1,0 +1,24 @@
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+
+  #root {
+    height: 100%;
+  }
+}
